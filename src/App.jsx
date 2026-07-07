@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 
+const asset = (path) => `${import.meta.env.BASE_URL}${path}`;
+
 const routes = [
   {
     eyebrow: "4 noites · costa",
@@ -9,7 +11,7 @@ const routes = [
       "Hospedagens discretas, barcos ao nascer do sol, cozinha de mar e mirantes que parecem editados a mão.",
     tags: ["oceano", "mesa autoral", "guia privado"],
     tone: "coast",
-    image: "/assets/nortada-hero.png",
+    image: asset("assets/nortada-hero.png"),
   },
   {
     eyebrow: "6 noites · interior",
@@ -18,7 +20,7 @@ const routes = [
       "Estradas cênicas, ateliers vivos, lareiras silenciosas e caminhadas desenhadas para terminar bem à mesa.",
     tags: ["serra", "arte local", "slow travel"],
     tone: "serra",
-    image: "/assets/nortada-serra-lunar.png",
+    image: asset("assets/nortada-serra-lunar.png"),
   },
   {
     eyebrow: "3 noites · vinho",
@@ -27,7 +29,7 @@ const routes = [
       "Provas íntimas, almoços de produtor, arquitetura rural e uma curadoria precisa de garrafas raras.",
     tags: ["vinho", "produtores", "hotelaria premium"],
     tone: "vinhas",
-    image: "/assets/nortada-vinhas-atlanticas.png",
+    image: asset("assets/nortada-vinhas-atlanticas.png"),
   },
 ];
 
@@ -139,7 +141,7 @@ function Hero() {
       >
         <motion.img
           key={heroMotionKey}
-          src="/assets/nortada-hero-landscape.png"
+          src={asset("assets/nortada-hero-landscape.png")}
           alt=""
           initial={{ scale: 1.02, x: "-2%", y: "-2%" }}
           animate={{ scale: 1.14, x: "-4%", y: "-3%" }}
@@ -295,7 +297,7 @@ function Story() {
 
         <div className="story-grid">
           <figure className="story-visual">
-            <img src="/assets/nortada-hero.png" alt="Costa atlântica ao entardecer" />
+            <img src={asset("assets/nortada-hero.png")} alt="Costa atlântica ao entardecer" />
             <figcaption className="story-caption">
               <strong>Atlântico norte</strong>
               <span>Travessias curtas, mesas longas e pontos de vista reservados.</span>

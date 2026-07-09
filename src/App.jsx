@@ -76,7 +76,7 @@ function Hero() {
   const [activeRoute, setActiveRoute] = useState(0);
   const heroRef = useRef(null);
   const heroVideoRef = useRef(null);
-  const heroVideoMaskRef = useRef(null);
+  const heroVideoVeilRef = useRef(null);
   const heroVideoRestartTimer = useRef(null);
   const isHeroVideoLooping = useRef(false);
   const wasHeroVisible = useRef(false);
@@ -88,7 +88,7 @@ function Hero() {
 
     window.clearTimeout(heroVideoRestartTimer.current);
     isHeroVideoLooping.current = false;
-    heroVideoMaskRef.current?.classList.remove("is-visible");
+    heroVideoVeilRef.current?.classList.remove("is-visible");
 
     if (video) {
       video.currentTime = 0;
@@ -99,7 +99,7 @@ function Hero() {
   const pauseHeroVideoLoop = () => {
     window.clearTimeout(heroVideoRestartTimer.current);
     isHeroVideoLooping.current = false;
-    heroVideoMaskRef.current?.classList.remove("is-visible");
+    heroVideoVeilRef.current?.classList.remove("is-visible");
     heroVideoRef.current?.pause();
   };
 
@@ -116,7 +116,7 @@ function Hero() {
 
     if (video.duration - video.currentTime <= HERO_VIDEO_LOOP_FADE_SECONDS) {
       isHeroVideoLooping.current = true;
-      heroVideoMaskRef.current?.classList.add("is-visible");
+      heroVideoVeilRef.current?.classList.add("is-visible");
     }
   };
 
@@ -127,14 +127,14 @@ function Hero() {
       return;
     }
 
-    heroVideoMaskRef.current?.classList.add("is-visible");
+    heroVideoVeilRef.current?.classList.add("is-visible");
     video.pause();
     video.currentTime = 0;
 
     window.clearTimeout(heroVideoRestartTimer.current);
     heroVideoRestartTimer.current = window.setTimeout(() => {
       void video.play().catch(() => {});
-      heroVideoMaskRef.current?.classList.remove("is-visible");
+      heroVideoVeilRef.current?.classList.remove("is-visible");
       isHeroVideoLooping.current = false;
     }, HERO_VIDEO_RESTART_DELAY_MS);
   };
@@ -201,7 +201,6 @@ function Hero() {
         <video
           ref={heroVideoRef}
           className="hero-video"
-          poster={asset("assets/nortada-hero-landscape.png")}
           autoPlay
           muted
           playsInline
@@ -211,11 +210,7 @@ function Hero() {
         >
           <source src={asset("assets/nortada-hero-waves.webm")} type="video/webm" />
         </video>
-        <div
-          ref={heroVideoMaskRef}
-          className="hero-loop-mask"
-          style={{ backgroundImage: `url(${asset("assets/nortada-hero-landscape.png")})` }}
-        />
+        <div ref={heroVideoVeilRef} className="hero-loop-veil" />
       </motion.div>
 
       <motion.div

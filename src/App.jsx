@@ -2,10 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 
 const asset = (path) => `${import.meta.env.BASE_URL}${path}`;
-const HERO_VIDEO_LOOP_FADE_SECONDS = 0.75;
-const HERO_VIDEO_RESTART_AT_SECONDS = 0.32;
-const HERO_VIDEO_RESTART_DELAY_MS = 90;
-const HERO_VIDEO_REVEAL_DELAY_MS = 360;
 
 const routes = [
   {
@@ -78,21 +74,12 @@ function Hero() {
   const [activeRoute, setActiveRoute] = useState(0);
   const heroRef = useRef(null);
   const heroVideoRef = useRef(null);
-  const heroVideoVeilRef = useRef(null);
-  const heroVideoRestartTimer = useRef(null);
-  const heroVideoRevealTimer = useRef(null);
-  const isHeroVideoLooping = useRef(false);
   const wasHeroVisible = useRef(false);
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.22], ["0%", "10%"]);
 
-  const resetHeroVideoLoop = () => {
+  const restartHeroVideo = () => {
     const video = heroVideoRef.current;
-
-    window.clearTimeout(heroVideoRestartTimer.current);
-    window.clearTimeout(heroVideoRevealTimer.current);
-    isHeroVideoLooping.current = false;
-    heroVideoVeilRef.current?.classList.remove("is-visible");
 
     if (video) {
       video.currentTime = 0;
@@ -100,34 +87,8 @@ function Hero() {
     }
   };
 
-  const pauseHeroVideoLoop = () => {
-    window.clearTimeout(heroVideoRestartTimer.current);
-    window.clearTimeout(heroVideoRevealTimer.current);
-    isHeroVideoLooping.current = false;
-    heroVideoVeilRef.current?.classList.remove("is-visible");
+  const pauseHeroVideo = () => {
     heroVideoRef.current?.pause();
-  };
-
-  const revealHeroVideo = () => {
-    heroVideoVeilRef.current?.classList.remove("is-visible");
-    isHeroVideoLooping.current = false;
-  };
-
-  const handleHeroVideoTimeUpdate = () => {
-    const video = heroVideoRef.current;
-
-    if (
-      !video ||
-      isHeroVideoLooping.current ||
-      !Number.isFinite(video.duration)
-    ) {
-      return;
-    }
-
-    if (video.duration - video.currentTime <= HERO_VIDEO_LOOP_FADE_SECONDS) {
-      isHeroVideoLooping.current = true;
-      heroVideoVeilRef.current?.classList.add("is-visible");
-    }
   };
 
   const handleHeroVideoEnded = () => {
@@ -137,31 +98,11 @@ function Hero() {
       return;
     }
 
-    heroVideoVeilRef.current?.classList.add("is-visible");
     video.pause();
-    video.currentTime = Number.isFinite(video.duration)
-      ? Math.min(HERO_VIDEO_RESTART_AT_SECONDS, Math.max(video.duration - 0.25, 0))
-      : HERO_VIDEO_RESTART_AT_SECONDS;
 
-    window.clearTimeout(heroVideoRestartTimer.current);
-    window.clearTimeout(heroVideoRevealTimer.current);
-    heroVideoRestartTimer.current = window.setTimeout(() => {
-      void video.play().catch(revealHeroVideo);
-
-      const scheduleReveal = () => {
-        heroVideoRevealTimer.current = window.setTimeout(
-          revealHeroVideo,
-          HERO_VIDEO_REVEAL_DELAY_MS,
-        );
-      };
-
-      if (typeof video.requestVideoFrameCallback === "function") {
-        video.requestVideoFrameCallback(scheduleReveal);
-        return;
-      }
-
-      scheduleReveal();
-    }, HERO_VIDEO_RESTART_DELAY_MS);
+    if (Number.isFinite(video.duration)) {
+      video.currentTime = Math.max(video.duration - 0.08, 0);
+    }
   };
 
   useEffect(() => {
@@ -184,12 +125,12 @@ function Hero() {
         const isVisible = entry.intersectionRatio >= 0.28;
 
         if (isVisible && !wasHeroVisible.current) {
-          resetHeroVideoLoop();
+          restartHeroVideo();
           wasHeroVisible.current = true;
         }
 
         if (!isVisible) {
-          pauseHeroVideoLoop();
+          pauseHeroVideo();
           wasHeroVisible.current = false;
         }
       },
@@ -198,11 +139,7 @@ function Hero() {
 
     observer.observe(heroElement);
 
-    return () => {
-      observer.disconnect();
-      window.clearTimeout(heroVideoRestartTimer.current);
-      window.clearTimeout(heroVideoRevealTimer.current);
-    };
+    return () => observer.disconnect();
   }, []);
 
   const textReveal = {
@@ -231,12 +168,10 @@ function Hero() {
           muted
           playsInline
           preload="auto"
-          onTimeUpdate={handleHeroVideoTimeUpdate}
           onEnded={handleHeroVideoEnded}
         >
           <source src={asset("assets/nortada-hero-waves.webm")} type="video/webm" />
         </video>
-        <div ref={heroVideoVeilRef} className="hero-loop-veil" />
       </motion.div>
 
       <motion.div

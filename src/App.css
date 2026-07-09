@@ -182,20 +182,6 @@ a {
   transform: translate(-50%, -50%);
 }
 
-.hero-loop-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  background: #091416;
-  transition: opacity 460ms ease;
-}
-
-.hero-loop-veil.is-visible {
-  opacity: 1;
-}
-
 .hero-motion::before {
   content: "";
   position: absolute;

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 
 const asset = (path) => `${import.meta.env.BASE_URL}${path}`;
+const HERO_VIDEO_CROSSFADE_SECONDS = 1.35;
 
 const routes = [
   {
@@ -73,10 +74,73 @@ function Header() {
 function Hero() {
   const [activeRoute, setActiveRoute] = useState(0);
   const heroRef = useRef(null);
-  const heroVideoRef = useRef(null);
+  const heroVideoARef = useRef(null);
+  const heroVideoBRef = useRef(null);
+  const activeHeroVideo = useRef(0);
+  const isHeroVideoCrossfading = useRef(false);
+  const heroVideoSwapTimer = useRef(null);
   const wasHeroVisible = useRef(false);
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.22], ["0%", "10%"]);
+
+  const getHeroVideos = () => [heroVideoARef.current, heroVideoBRef.current];
+
+  const resetHeroVideoLoop = () => {
+    window.clearTimeout(heroVideoSwapTimer.current);
+    isHeroVideoCrossfading.current = false;
+    activeHeroVideo.current = 0;
+
+    getHeroVideos().forEach((video, index) => {
+      if (!video) {
+        return;
+      }
+
+      video.pause();
+      video.currentTime = 0;
+      video.classList.toggle("is-active", index === 0);
+    });
+
+    void heroVideoARef.current?.play().catch(() => {});
+  };
+
+  const pauseHeroVideoLoop = () => {
+    window.clearTimeout(heroVideoSwapTimer.current);
+    isHeroVideoCrossfading.current = false;
+    getHeroVideos().forEach((video) => video?.pause());
+  };
+
+  const handleHeroVideoTimeUpdate = () => {
+    const videos = getHeroVideos();
+    const outgoing = videos[activeHeroVideo.current];
+    const incomingIndex = activeHeroVideo.current === 0 ? 1 : 0;
+    const incoming = videos[incomingIndex];
+
+    if (
+      !outgoing ||
+      !incoming ||
+      isHeroVideoCrossfading.current ||
+      !Number.isFinite(outgoing.duration)
+    ) {
+      return;
+    }
+
+    if (outgoing.currentTime < outgoing.duration - HERO_VIDEO_CROSSFADE_SECONDS) {
+      return;
+    }
+
+    isHeroVideoCrossfading.current = true;
+    incoming.currentTime = 0;
+    incoming.classList.add("is-active");
+    void incoming.play().catch(() => {});
+
+    heroVideoSwapTimer.current = window.setTimeout(() => {
+      outgoing.pause();
+      outgoing.currentTime = 0;
+      outgoing.classList.remove("is-active");
+      activeHeroVideo.current = incomingIndex;
+      isHeroVideoCrossfading.current = false;
+    }, HERO_VIDEO_CROSSFADE_SECONDS * 1000);
+  };
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -96,19 +160,14 @@ function Hero() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const isVisible = entry.intersectionRatio >= 0.28;
-        const video = heroVideoRef.current;
 
         if (isVisible && !wasHeroVisible.current) {
-          if (video) {
-            video.currentTime = 0;
-            void video.play().catch(() => {});
-          }
-
+          resetHeroVideoLoop();
           wasHeroVisible.current = true;
         }
 
         if (!isVisible) {
-          video?.pause();
+          pauseHeroVideoLoop();
           wasHeroVisible.current = false;
         }
       },
@@ -117,7 +176,10 @@ function Hero() {
 
     observer.observe(heroElement);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(heroVideoSwapTimer.current);
+    };
   }, []);
 
   const textReveal = {
@@ -140,14 +202,25 @@ function Hero() {
         style={{ y: heroY }}
       >
         <video
-          ref={heroVideoRef}
-          className="hero-video"
+          ref={heroVideoARef}
+          className="hero-video is-active"
           poster={asset("assets/nortada-hero-landscape.png")}
           autoPlay
           muted
-          loop
           playsInline
-          preload="metadata"
+          preload="auto"
+          onTimeUpdate={handleHeroVideoTimeUpdate}
+        >
+          <source src={asset("assets/nortada-hero-waves.webm")} type="video/webm" />
+        </video>
+        <video
+          ref={heroVideoBRef}
+          className="hero-video"
+          poster={asset("assets/nortada-hero-landscape.png")}
+          muted
+          playsInline
+          preload="auto"
+          onTimeUpdate={handleHeroVideoTimeUpdate}
         >
           <source src={asset("assets/nortada-hero-waves.webm")} type="video/webm" />
         </video>

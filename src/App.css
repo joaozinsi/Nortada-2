@@ -158,12 +158,14 @@ a {
   will-change: transform;
 }
 
-.hero-motion img {
+.hero-motion img,
+.hero-motion video {
   width: 112%;
   height: 112%;
   max-width: none;
   object-fit: cover;
   object-position: center;
+  display: block;
   filter: saturate(1.06) contrast(1.02);
   will-change: transform;
 }

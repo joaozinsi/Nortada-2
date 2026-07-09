@@ -72,9 +72,8 @@ function Header() {
 
 function Hero() {
   const [activeRoute, setActiveRoute] = useState(0);
-  const [heroMotionKey, setHeroMotionKey] = useState(0);
   const heroRef = useRef(null);
-  const hasObservedHero = useRef(false);
+  const heroVideoRef = useRef(null);
   const wasHeroVisible = useRef(false);
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.22], ["0%", "10%"]);
@@ -97,20 +96,21 @@ function Hero() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const isVisible = entry.intersectionRatio >= 0.28;
+        const video = heroVideoRef.current;
 
         if (isVisible && !wasHeroVisible.current) {
-          if (hasObservedHero.current) {
-            setHeroMotionKey((current) => current + 1);
+          if (video) {
+            video.currentTime = 0;
+            void video.play().catch(() => {});
           }
 
           wasHeroVisible.current = true;
         }
 
         if (!isVisible) {
+          video?.pause();
           wasHeroVisible.current = false;
         }
-
-        hasObservedHero.current = true;
       },
       { threshold: [0, 0.28] },
     );
@@ -139,17 +139,18 @@ function Hero() {
         ref={heroRef}
         style={{ y: heroY }}
       >
-        <motion.img
-          key={heroMotionKey}
-          src={asset("assets/nortada-hero-landscape.png")}
-          alt=""
-          initial={{ scale: 1.02, x: "-2%", y: "-2%" }}
-          animate={{ scale: 1.14, x: "-4%", y: "-3%" }}
-          transition={{
-            duration: 14,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        />
+        <video
+          ref={heroVideoRef}
+          className="hero-video"
+          poster={asset("assets/nortada-hero-landscape.png")}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+        >
+          <source src={asset("assets/nortada-hero-waves.webm")} type="video/webm" />
+        </video>
       </motion.div>
 
       <motion.div

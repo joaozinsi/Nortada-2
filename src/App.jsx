@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 
 const asset = (path) => `${import.meta.env.BASE_URL}${path}`;
-const HERO_VIDEO_CROSSFADE_SECONDS = 1.35;
+const HERO_VIDEO_LOOP_FADE_SECONDS = 0.7;
+const HERO_VIDEO_RESTART_DELAY_MS = 90;
 
 const routes = [
   {
@@ -74,78 +75,74 @@ function Header() {
 function Hero() {
   const [activeRoute, setActiveRoute] = useState(0);
   const heroRef = useRef(null);
-  const heroVideoARef = useRef(null);
-  const heroVideoBRef = useRef(null);
-  const activeHeroVideo = useRef(0);
-  const isHeroVideoCrossfading = useRef(false);
-  const heroVideoSwapTimer = useRef(null);
+  const heroVideoRef = useRef(null);
+  const heroVideoMaskRef = useRef(null);
+  const heroVideoRestartTimer = useRef(null);
+  const isHeroVideoLooping = useRef(false);
   const wasHeroVisible = useRef(false);
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.22], ["0%", "10%"]);
 
-  const getHeroVideos = () => [heroVideoARef.current, heroVideoBRef.current];
-
   const resetHeroVideoLoop = () => {
-    window.clearTimeout(heroVideoSwapTimer.current);
-    isHeroVideoCrossfading.current = false;
-    activeHeroVideo.current = 0;
+    const video = heroVideoRef.current;
 
-    getHeroVideos().forEach((video, index) => {
-      if (!video) {
-        return;
-      }
+    window.clearTimeout(heroVideoRestartTimer.current);
+    isHeroVideoLooping.current = false;
+    heroVideoMaskRef.current?.classList.remove("is-visible");
 
-      video.pause();
+    if (video) {
       video.currentTime = 0;
-      video.classList.toggle("is-active", index === 0);
-    });
-
-    void heroVideoARef.current?.play().catch(() => {});
+      void video.play().catch(() => {});
+    }
   };
 
   const pauseHeroVideoLoop = () => {
-    window.clearTimeout(heroVideoSwapTimer.current);
-    isHeroVideoCrossfading.current = false;
-    getHeroVideos().forEach((video) => video?.pause());
+    window.clearTimeout(heroVideoRestartTimer.current);
+    isHeroVideoLooping.current = false;
+    heroVideoMaskRef.current?.classList.remove("is-visible");
+    heroVideoRef.current?.pause();
   };
 
   const handleHeroVideoTimeUpdate = () => {
-    const videos = getHeroVideos();
-    const outgoing = videos[activeHeroVideo.current];
-    const incomingIndex = activeHeroVideo.current === 0 ? 1 : 0;
-    const incoming = videos[incomingIndex];
+    const video = heroVideoRef.current;
 
     if (
-      !outgoing ||
-      !incoming ||
-      isHeroVideoCrossfading.current ||
-      !Number.isFinite(outgoing.duration)
+      !video ||
+      isHeroVideoLooping.current ||
+      !Number.isFinite(video.duration)
     ) {
       return;
     }
 
-    if (outgoing.currentTime < outgoing.duration - HERO_VIDEO_CROSSFADE_SECONDS) {
+    if (video.duration - video.currentTime <= HERO_VIDEO_LOOP_FADE_SECONDS) {
+      isHeroVideoLooping.current = true;
+      heroVideoMaskRef.current?.classList.add("is-visible");
+    }
+  };
+
+  const handleHeroVideoEnded = () => {
+    const video = heroVideoRef.current;
+
+    if (!video) {
       return;
     }
 
-    isHeroVideoCrossfading.current = true;
-    incoming.currentTime = 0;
-    incoming.classList.add("is-active");
-    void incoming.play().catch(() => {});
+    heroVideoMaskRef.current?.classList.add("is-visible");
+    video.pause();
+    video.currentTime = 0;
 
-    heroVideoSwapTimer.current = window.setTimeout(() => {
-      outgoing.pause();
-      outgoing.currentTime = 0;
-      outgoing.classList.remove("is-active");
-      activeHeroVideo.current = incomingIndex;
-      isHeroVideoCrossfading.current = false;
-    }, HERO_VIDEO_CROSSFADE_SECONDS * 1000);
+    window.clearTimeout(heroVideoRestartTimer.current);
+    heroVideoRestartTimer.current = window.setTimeout(() => {
+      void video.play().catch(() => {});
+      heroVideoMaskRef.current?.classList.remove("is-visible");
+      isHeroVideoLooping.current = false;
+    }, HERO_VIDEO_RESTART_DELAY_MS);
   };
 
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActiveRoute((current) => (current + 1) % routes.length);
-    }, 3600);
+    }, 6200);
 
     return () => window.clearInterval(timer);
   }, []);
@@ -178,7 +175,7 @@ function Hero() {
 
     return () => {
       observer.disconnect();
-      window.clearTimeout(heroVideoSwapTimer.current);
+      window.clearTimeout(heroVideoRestartTimer.current);
     };
   }, []);
 
@@ -202,28 +199,23 @@ function Hero() {
         style={{ y: heroY }}
       >
         <video
-          ref={heroVideoARef}
-          className="hero-video is-active"
+          ref={heroVideoRef}
+          className="hero-video"
           poster={asset("assets/nortada-hero-landscape.png")}
           autoPlay
           muted
           playsInline
           preload="auto"
           onTimeUpdate={handleHeroVideoTimeUpdate}
+          onEnded={handleHeroVideoEnded}
         >
           <source src={asset("assets/nortada-hero-waves.webm")} type="video/webm" />
         </video>
-        <video
-          ref={heroVideoBRef}
-          className="hero-video"
-          poster={asset("assets/nortada-hero-landscape.png")}
-          muted
-          playsInline
-          preload="auto"
-          onTimeUpdate={handleHeroVideoTimeUpdate}
-        >
-          <source src={asset("assets/nortada-hero-waves.webm")} type="video/webm" />
-        </video>
+        <div
+          ref={heroVideoMaskRef}
+          className="hero-loop-mask"
+          style={{ backgroundImage: `url(${asset("assets/nortada-hero-landscape.png")})` }}
+        />
       </motion.div>
 
       <motion.div
@@ -297,7 +289,7 @@ function Hero() {
 
             <div className="hero-card-rail" aria-label="Escolher experiência em destaque">
               {routes.map((route, index) => (
-                <motion.button
+                <button
                   type="button"
                   className={`rail-card ${route.tone} ${
                     index === activeRoute ? "is-active" : ""
@@ -308,21 +300,10 @@ function Hero() {
                   onClick={() => {
                     setActiveRoute(index);
                   }}
-                  animate={{
-                    y: index === activeRoute ? -10 : [0, -6, 0],
-                    opacity: index === activeRoute ? 1 : 0.66,
-                    scale: index === activeRoute ? 1.04 : 0.96,
-                  }}
-                  transition={{
-                    duration: 1.1,
-                    repeat: index === activeRoute ? 0 : Infinity,
-                    repeatDelay: 1.4 + index * 0.2,
-                    ease: "easeInOut",
-                  }}
                 >
                   <img src={route.image} alt="" />
                   <span>{route.title}</span>
-                </motion.button>
+                </button>
               ))}
             </div>
           </div>

@@ -340,10 +340,10 @@ h1 {
 
 .hero-interface {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
   align-items: start;
-  gap: clamp(18px, 3vw, 34px);
-  margin-top: clamp(24px, 3vw, 38px);
+  gap: clamp(16px, 2.4vw, 30px);
+  margin-top: clamp(18px, 2.2vw, 28px);
 }
 
 .hero-briefing-panel {
@@ -354,10 +354,10 @@ h1 {
     minmax(148px, 1.22fr)
     minmax(94px, 0.7fr);
   align-items: stretch;
-  min-height: 78px;
+  min-height: 70px;
   overflow: hidden;
   border: 1px solid rgba(255, 254, 250, 0.24);
-  border-radius: 30px;
+  border-radius: 24px;
   background:
     linear-gradient(135deg, rgba(255, 254, 250, 0.2), rgba(255, 254, 250, 0.07)),
     rgba(13, 28, 30, 0.38);
@@ -367,11 +367,11 @@ h1 {
 
 .hero-briefing-panel div,
 .hero-briefing-panel a {
-  min-height: 78px;
+  min-height: 70px;
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 0 clamp(14px, 1.45vw, 24px);
+  padding: 0 clamp(13px, 1.25vw, 20px);
 }
 
 .hero-briefing-panel div {
@@ -394,7 +394,7 @@ h1 {
 .hero-briefing-panel strong {
   display: block;
   font-family: var(--sans);
-  font-size: clamp(0.94rem, 0.28vw + 0.88rem, 1.08rem);
+  font-size: clamp(0.9rem, 0.22vw + 0.86rem, 1.02rem);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: 0.01em;
@@ -423,7 +423,7 @@ h1 {
 
 .hero-experience-stage {
   position: relative;
-  min-height: 374px;
+  min-height: 342px;
 }
 
 .hero-feature-card {
@@ -432,10 +432,12 @@ h1 {
   overflow: hidden;
   contain: paint;
   border: 1px solid rgba(255, 254, 250, 0.42);
-  border-radius: 26px;
+  border-radius: 22px;
   color: var(--ink);
-  background: rgba(255, 254, 250, 0.9);
-  box-shadow: 0 26px 70px rgba(3, 10, 11, 0.36);
+  background:
+    linear-gradient(180deg, rgba(255, 254, 250, 0.94), rgba(242, 239, 230, 0.9)),
+    rgba(255, 254, 250, 0.9);
+  box-shadow: 0 22px 56px rgba(3, 10, 11, 0.34);
   will-change: opacity, transform;
 }
 
@@ -452,7 +454,7 @@ h1 {
 
 .feature-image {
   position: relative;
-  height: 164px;
+  height: 124px;
   overflow: hidden;
   background: var(--deep);
 }
@@ -482,48 +484,49 @@ h1 {
 .feature-content {
   position: relative;
   z-index: 2;
-  padding: 22px 24px 24px;
+  padding: 18px 20px 20px;
 }
 
 .feature-content small {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--copper);
-  font-size: 0.68rem;
+  font-size: 0.63rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
 
 .feature-content h3 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: var(--deep);
   font-family: var(--serif);
-  font-size: clamp(1.55rem, 1.5vw, 2rem);
+  font-size: clamp(1.38rem, 1.1vw, 1.74rem);
   font-weight: 600;
 }
 
 .feature-content p {
   margin: 0;
   color: #596866;
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 0.84rem;
+  line-height: 1.48;
 }
 
 .hero-card-rail {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .rail-card {
   appearance: none;
   position: relative;
-  min-height: 106px;
+  height: 66px;
+  min-height: 66px;
   overflow: hidden;
   border: 1px solid rgba(255, 254, 250, 0.24);
-  border-radius: 18px;
+  border-radius: 14px;
   background: rgba(16, 22, 23, 0.34);
   box-shadow: 0 18px 48px rgba(3, 10, 11, 0.24);
   padding: 0;
@@ -544,7 +547,7 @@ h1 {
 .rail-card img {
   width: 100%;
   height: 100%;
-  min-height: 106px;
+  min-height: 66px;
   object-fit: cover;
   display: block;
   opacity: 0.8;
@@ -560,11 +563,11 @@ h1 {
 .rail-card span {
   position: absolute;
   z-index: 1;
-  left: 12px;
-  right: 12px;
-  bottom: 11px;
+  left: 10px;
+  right: 10px;
+  bottom: 8px;
   color: var(--white);
-  font-size: 0.72rem;
+  font-size: 0.6rem;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -572,14 +575,14 @@ h1 {
 .rail-card.is-active {
   border-color: rgba(199, 161, 90, 0.72);
   opacity: 1;
-  transform: translateY(-10px);
+  transform: translateY(-6px);
 }
 
 .rail-card:hover,
 .rail-card:focus-visible {
   border-color: rgba(199, 161, 90, 0.86);
   opacity: 1;
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   box-shadow:
     0 20px 52px rgba(3, 10, 11, 0.3),
     inset 0 0 0 1px rgba(199, 161, 90, 0.18);
@@ -587,7 +590,7 @@ h1 {
 
 .rail-card.is-active:hover,
 .rail-card.is-active:focus-visible {
-  transform: translateY(-10px);
+  transform: translateY(-6px);
 }
 
 .rail-card:focus-visible {
@@ -998,13 +1001,13 @@ h2 {
 
   .hero-briefing-panel {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-radius: 28px;
+    border-radius: 24px;
   }
 
   .hero-briefing-panel div,
   .hero-briefing-panel a {
-    min-height: 74px;
-    padding: 0 clamp(16px, 3vw, 24px);
+    min-height: 66px;
+    padding: 0 clamp(14px, 2.6vw, 20px);
   }
 
   .hero-briefing-panel div:nth-child(3) {
@@ -1013,7 +1016,7 @@ h2 {
 
   .hero-briefing-panel a {
     grid-column: 1 / -1;
-    min-height: 54px;
+    min-height: 50px;
     border-top: 1px solid rgba(255, 254, 250, 0.16);
   }
 
@@ -1078,32 +1081,46 @@ h2 {
   }
 
   .hero-briefing-panel {
-    grid-template-columns: 1fr;
-    border-radius: 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: 22px;
   }
 
   .hero-briefing-panel div,
   .hero-briefing-panel a {
-    min-height: 68px;
-    padding: 0 20px;
+    min-height: 62px;
+    padding: 0 14px;
   }
 
   .hero-briefing-panel div {
-    border-right: 0;
     border-bottom: 1px solid rgba(255, 254, 250, 0.16);
   }
 
+  .hero-briefing-panel div:nth-child(odd) {
+    border-right: 1px solid rgba(255, 254, 250, 0.16);
+  }
+
+  .hero-briefing-panel div:nth-child(2),
   .hero-briefing-panel a {
-    min-height: 56px;
+    border-right: 0;
+  }
+
+  .hero-briefing-panel div:nth-child(3) {
+    border-bottom: 0;
+  }
+
+  .hero-briefing-panel a {
+    grid-column: auto;
+    min-height: 62px;
+    border-left: 1px solid rgba(255, 254, 250, 0.16);
     border-top: 0;
   }
 
   .hero-experience-stage {
-    min-height: 326px;
+    min-height: 340px;
   }
 
   .feature-image {
-    height: 128px;
+    height: 126px;
   }
 
   .hero-card-rail {
@@ -1111,12 +1128,13 @@ h2 {
   }
 
   .rail-card {
-    min-height: 84px;
-    border-radius: 14px;
+    height: 72px;
+    min-height: 72px;
+    border-radius: 13px;
   }
 
   .rail-card img {
-    min-height: 84px;
+    min-height: 72px;
   }
 
   .rail-card span {

@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 
 const asset = (path) => `${import.meta.env.BASE_URL}${path}`;
-const HERO_VIDEO_LOOP_FADE_SECONDS = 0.7;
+const HERO_VIDEO_LOOP_FADE_SECONDS = 0.75;
+const HERO_VIDEO_RESTART_AT_SECONDS = 0.32;
 const HERO_VIDEO_RESTART_DELAY_MS = 90;
+const HERO_VIDEO_REVEAL_DELAY_MS = 360;
 
 const routes = [
   {
@@ -78,6 +80,7 @@ function Hero() {
   const heroVideoRef = useRef(null);
   const heroVideoVeilRef = useRef(null);
   const heroVideoRestartTimer = useRef(null);
+  const heroVideoRevealTimer = useRef(null);
   const isHeroVideoLooping = useRef(false);
   const wasHeroVisible = useRef(false);
   const { scrollYProgress } = useScroll();
@@ -87,6 +90,7 @@ function Hero() {
     const video = heroVideoRef.current;
 
     window.clearTimeout(heroVideoRestartTimer.current);
+    window.clearTimeout(heroVideoRevealTimer.current);
     isHeroVideoLooping.current = false;
     heroVideoVeilRef.current?.classList.remove("is-visible");
 
@@ -98,9 +102,15 @@ function Hero() {
 
   const pauseHeroVideoLoop = () => {
     window.clearTimeout(heroVideoRestartTimer.current);
+    window.clearTimeout(heroVideoRevealTimer.current);
     isHeroVideoLooping.current = false;
     heroVideoVeilRef.current?.classList.remove("is-visible");
     heroVideoRef.current?.pause();
+  };
+
+  const revealHeroVideo = () => {
+    heroVideoVeilRef.current?.classList.remove("is-visible");
+    isHeroVideoLooping.current = false;
   };
 
   const handleHeroVideoTimeUpdate = () => {
@@ -129,13 +139,28 @@ function Hero() {
 
     heroVideoVeilRef.current?.classList.add("is-visible");
     video.pause();
-    video.currentTime = 0;
+    video.currentTime = Number.isFinite(video.duration)
+      ? Math.min(HERO_VIDEO_RESTART_AT_SECONDS, Math.max(video.duration - 0.25, 0))
+      : HERO_VIDEO_RESTART_AT_SECONDS;
 
     window.clearTimeout(heroVideoRestartTimer.current);
+    window.clearTimeout(heroVideoRevealTimer.current);
     heroVideoRestartTimer.current = window.setTimeout(() => {
-      void video.play().catch(() => {});
-      heroVideoVeilRef.current?.classList.remove("is-visible");
-      isHeroVideoLooping.current = false;
+      void video.play().catch(revealHeroVideo);
+
+      const scheduleReveal = () => {
+        heroVideoRevealTimer.current = window.setTimeout(
+          revealHeroVideo,
+          HERO_VIDEO_REVEAL_DELAY_MS,
+        );
+      };
+
+      if (typeof video.requestVideoFrameCallback === "function") {
+        video.requestVideoFrameCallback(scheduleReveal);
+        return;
+      }
+
+      scheduleReveal();
     }, HERO_VIDEO_RESTART_DELAY_MS);
   };
 
@@ -176,6 +201,7 @@ function Hero() {
     return () => {
       observer.disconnect();
       window.clearTimeout(heroVideoRestartTimer.current);
+      window.clearTimeout(heroVideoRevealTimer.current);
     };
   }, []);
 

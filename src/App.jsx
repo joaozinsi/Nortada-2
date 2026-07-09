@@ -222,18 +222,13 @@ function Hero() {
               <motion.article
                 className={`hero-feature-card ${active.tone}`}
                 key={active.title}
-                initial={{ opacity: 0, x: 72, rotate: 2.5, scale: 0.92 }}
-                animate={{ opacity: 1, x: 0, rotate: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -64, rotate: -2.5, scale: 0.95 }}
+                initial={{ opacity: 0, x: 72, rotate: 2.5 }}
+                animate={{ opacity: 1, x: 0, rotate: 0 }}
+                exit={{ opacity: 0, x: -64, rotate: -2.5 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="feature-image">
-                  <motion.img
-                    src={active.image}
-                    alt=""
-                    animate={{ scale: [1.08, 1.18], x: ["-2%", "2%"] }}
-                    transition={{ duration: 3.6, ease: "easeInOut" }}
-                  />
+                  <img src={active.image} alt="" />
                 </div>
                 <div className="feature-content">
                   <small>{active.eyebrow}</small>

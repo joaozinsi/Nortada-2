@@ -1451,10 +1451,19 @@ h2 {
 
   .hero-actions {
     width: 100%;
+    justify-content: center;
+  }
+
+  .hero-actions .button.secondary {
+    display: none;
+  }
+
+  .hero-actions .button.primary {
+    flex: 0 1 min(100%, 260px);
   }
 
   .button {
-    flex: 1 1 100%;
+    flex: 0 1 min(100%, 260px);
     white-space: normal;
     text-align: center;
   }
@@ -1478,6 +1487,9 @@ h2 {
   .hero-scene-note {
     grid-template-columns: 1fr;
     gap: 9px;
+    min-height: 74px;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .hero-scene-note strong {

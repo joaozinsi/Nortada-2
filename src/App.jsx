@@ -48,7 +48,7 @@ const routes = [
     coordinates: "vinhas de vento",
     mood: "verde mineral",
     signal: "produtor · garrafas raras · arquitetura rural",
-    scene: "A mesa aparece entre vinhas, com tempo suficiente para a conversa amadurecer.",
+    scene: "A mesa surge entre vinhas; a conversa amadurece.",
     accent: "#d1b46f",
     wash: "rgba(78, 103, 52, 0.5)",
   },
@@ -111,9 +111,6 @@ function Header() {
         <a href="#roteiros">Roteiros</a>
         <a href="#contato">Contato</a>
       </nav>
-      <a className="header-contact" href="#contato">
-        Falar com concierge
-      </a>
     </header>
   );
 }
@@ -299,7 +296,10 @@ function Hero() {
                 <span>Experiência</span>
                 <strong>sob medida</strong>
               </div>
-              <a href="#contato">Briefing</a>
+              <div>
+                <span>Briefing</span>
+                <strong>único</strong>
+              </div>
             </div>
           </div>
 

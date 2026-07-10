@@ -1454,6 +1454,10 @@ h2 {
     justify-content: center;
   }
 
+  .hero-copy {
+    gap: 40px;
+  }
+
   .hero-actions .button.secondary {
     display: none;
   }
@@ -1474,7 +1478,7 @@ h2 {
   }
 
   .hero-interface {
-    margin-top: 22px;
+    margin-top: 0;
   }
 
   .hero-atmosphere {
@@ -1487,7 +1491,7 @@ h2 {
   .hero-scene-note {
     grid-template-columns: 1fr;
     gap: 9px;
-    min-height: 74px;
+    min-height: 32px;
     visibility: hidden;
     pointer-events: none;
   }

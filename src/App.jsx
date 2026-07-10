@@ -12,6 +12,13 @@ const routes = [
     tags: ["oceano", "mesa autoral", "guia privado"],
     tone: "coast",
     image: asset("assets/nortada-hero.png"),
+    chapter: "Ato I",
+    coordinates: "Atlântico norte",
+    mood: "bruma fria",
+    signal: "maré baixa · barcos antes do sol",
+    scene: "O barco sai antes do sol e o dia começa pelo silêncio.",
+    accent: "#c7a15a",
+    wash: "rgba(41, 93, 98, 0.46)",
   },
   {
     eyebrow: "6 noites · interior",
@@ -21,6 +28,13 @@ const routes = [
     tags: ["serra", "arte local", "slow travel"],
     tone: "serra",
     image: asset("assets/nortada-serra-lunar.png"),
+    chapter: "Ato II",
+    coordinates: "interior alto",
+    mood: "estrada lenta",
+    signal: "lareira · atelier · mesa longa",
+    scene: "A estrada sobe devagar, como se o roteiro esperasse a paisagem respirar.",
+    accent: "#b46a4f",
+    wash: "rgba(95, 68, 44, 0.48)",
   },
   {
     eyebrow: "3 noites · vinho",
@@ -30,6 +44,13 @@ const routes = [
     tags: ["vinho", "produtores", "hotelaria premium"],
     tone: "vinhas",
     image: asset("assets/nortada-vinhas-atlanticas.png"),
+    chapter: "Ato III",
+    coordinates: "vinhas de vento",
+    mood: "verde mineral",
+    signal: "produtor · garrafas raras · arquitetura rural",
+    scene: "A mesa aparece entre vinhas, com tempo suficiente para a conversa amadurecer.",
+    accent: "#d1b46f",
+    wash: "rgba(78, 103, 52, 0.5)",
   },
 ];
 
@@ -48,6 +69,33 @@ const principles = [
     title: "Concierge claro",
     description:
       "Uma pessoa acompanha o roteiro, ajusta detalhes e mantém o viajante orientado.",
+  },
+];
+
+const storyBeats = [
+  {
+    label: "Chegada",
+    title: "A viagem abre em baixa velocidade.",
+    description:
+      "O primeiro deslocamento já vem com contexto, luz certa e uma chegada que não parece logística.",
+  },
+  {
+    label: "Travessia",
+    title: "Cada cena tem um motivo.",
+    description:
+      "Barco, estrada, trilha ou mesa entram quando criam memória, não para preencher um roteiro.",
+  },
+  {
+    label: "Mesa",
+    title: "O território chega pelo encontro.",
+    description:
+      "Chefs, produtores e anfitriões aparecem como parte da paisagem, com tempo para conversa.",
+  },
+  {
+    label: "Memória",
+    title: "O fim não tem pressa.",
+    description:
+      "A última cena deixa espaço para o viajante entender o que acabou de viver.",
   },
 ];
 
@@ -154,13 +202,33 @@ function Hero() {
   const active = routes[activeRoute];
 
   return (
-    <section className="hero" id="top" aria-label="Nortada turismo de experiência">
+    <section
+      className={`hero hero-${active.tone}`}
+      id="top"
+      aria-label="Nortada turismo de experiência"
+      style={{
+        "--route-accent": active.accent,
+        "--route-wash": active.wash,
+      }}
+    >
       <motion.div
         className="hero-motion"
         aria-hidden="true"
         ref={heroRef}
         style={{ y: heroY }}
       >
+        <AnimatePresence mode="wait">
+          <motion.img
+            className="hero-atmosphere"
+            key={active.image}
+            src={active.image}
+            alt=""
+            initial={{ opacity: 0, scale: 1.08, x: 42 }}
+            animate={{ opacity: 0.34, scale: 1.02, x: 0 }}
+            exit={{ opacity: 0, scale: 1.04, x: -34 }}
+            transition={{ duration: 1.25, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </AnimatePresence>
         <video
           ref={heroVideoRef}
           className="hero-video"
@@ -183,7 +251,9 @@ function Hero() {
         <motion.p className="hero-kicker" variants={textReveal}>
           Turismo de experiência no ritmo do vento norte
         </motion.p>
-        <motion.h1 variants={textReveal}>nortada</motion.h1>
+        <motion.h1 className="hero-title" variants={textReveal}>
+          <span>nortada</span>
+        </motion.h1>
         <motion.div className="hero-copy" variants={textReveal}>
           <p>
             Roteiros privados que costuram paisagem, gastronomia e encontros locais
@@ -201,20 +271,36 @@ function Hero() {
         </motion.div>
 
         <motion.div className="hero-interface" variants={textReveal}>
-          <div className="hero-briefing-panel" aria-label="Briefing inicial">
-            <div>
-              <span>Data</span>
-              <strong>flexível</strong>
+          <div className="hero-command-stack">
+            <AnimatePresence mode="wait">
+              <motion.div
+                className="hero-scene-note"
+                key={active.title}
+                initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -12, filter: "blur(8px)" }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <span>{active.chapter}</span>
+                <strong>{active.scene}</strong>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="hero-briefing-panel" aria-label="Briefing inicial">
+              <div>
+                <span>Data</span>
+                <strong>flexível</strong>
+              </div>
+              <div>
+                <span>Ritmo</span>
+                <strong>privado</strong>
+              </div>
+              <div>
+                <span>Experiência</span>
+                <strong>sob medida</strong>
+              </div>
+              <a href="#contato">Briefing</a>
             </div>
-            <div>
-              <span>Ritmo</span>
-              <strong>privado</strong>
-            </div>
-            <div>
-              <span>Experiência</span>
-              <strong>sob medida</strong>
-            </div>
-            <a href="#contato">Briefing</a>
           </div>
 
           <div className="hero-experience-stage" aria-label="Experiência em destaque">
@@ -229,11 +315,16 @@ function Hero() {
               >
                 <div className="feature-image">
                   <img src={active.image} alt="" />
+                  <div className="feature-route-line">
+                    <span>{active.chapter}</span>
+                    <span>{active.coordinates}</span>
+                  </div>
                 </div>
                 <div className="feature-content">
                   <small>{active.eyebrow}</small>
                   <h3>{active.title}</h3>
                   <p>{active.description}</p>
+                  <strong className="feature-signal">{active.signal}</strong>
                 </div>
               </motion.article>
             </AnimatePresence>
@@ -289,7 +380,13 @@ function Story() {
   return (
     <section className="section intro" id="experiencias">
       <div className="section-inner">
-        <div className="split-heading">
+        <motion.div
+          className="split-heading"
+          initial={{ opacity: 0, y: 42 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div>
             <p className="section-label">Narrativa visual</p>
             <h2>O destino aparece como história, não como checklist.</h2>
@@ -299,26 +396,64 @@ function Story() {
             contexto e acesso. Cada roteiro nasce de uma conversa e vira uma sequência
             elegante de cenas: chegada, descoberta, mesa, silêncio, travessia e memória.
           </p>
-        </div>
+        </motion.div>
 
         <div className="story-grid">
-          <figure className="story-visual">
+          <motion.figure
+            className="story-visual"
+            initial={{ opacity: 0, clipPath: "inset(14% 0 14% 0)" }}
+            whileInView={{ opacity: 1, clipPath: "inset(0% 0 0% 0)" }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          >
             <img src={asset("assets/nortada-hero.png")} alt="Costa atlântica ao entardecer" />
+            <div className="story-compass" aria-hidden="true">
+              <span>N</span>
+              <strong>38°</strong>
+            </div>
             <figcaption className="story-caption">
               <strong>Atlântico norte</strong>
               <span>Travessias curtas, mesas longas e pontos de vista reservados.</span>
             </figcaption>
-          </figure>
+          </motion.figure>
 
-          <div className="principles">
-            {principles.map((principle, index) => (
-              <article className="principle" key={principle.title}>
-                <span>{index + 1}</span>
-                <h3>{principle.title}</h3>
-                <p>{principle.description}</p>
-              </article>
+          <div className="story-chapters">
+            {storyBeats.map((beat, index) => (
+              <motion.article
+                className="story-chapter"
+                key={beat.label}
+                initial={{ opacity: 0, x: 34 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.45 }}
+                transition={{
+                  delay: index * 0.08,
+                  duration: 0.72,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <span>{beat.label}</span>
+                <h3>{beat.title}</h3>
+                <p>{beat.description}</p>
+              </motion.article>
             ))}
           </div>
+        </div>
+
+        <div className="principles" aria-label="Princípios Nortada">
+          {principles.map((principle, index) => (
+            <motion.article
+              className="principle"
+              key={principle.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ delay: index * 0.08, duration: 0.62 }}
+            >
+              <span>{index + 1}</span>
+              <h3>{principle.title}</h3>
+              <p>{principle.description}</p>
+            </motion.article>
+          ))}
         </div>
       </div>
     </section>
@@ -341,15 +476,29 @@ function Routes() {
         </div>
 
         <div className="routes-grid">
-          {routes.map((route) => (
-            <article className={`route ${route.tone}`} key={route.title}>
+          {routes.map((route, index) => (
+            <motion.article
+              className={`route ${route.tone}`}
+              key={route.title}
+              initial={{ opacity: 0, y: 34 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{
+                delay: index * 0.08,
+                duration: 0.72,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
               <div className="route-image">
                 <img src={route.image} alt="" />
+                <span>{route.chapter}</span>
               </div>
               <div className="route-body">
+                <div className="route-coordinates">{route.coordinates}</div>
                 <small>{route.eyebrow}</small>
                 <h3>{route.title}</h3>
                 <p>{route.description}</p>
+                <blockquote>{route.scene}</blockquote>
                 <div className="route-footer">
                   {route.tags.map((tag) => (
                     <span className="pill" key={tag}>
@@ -358,7 +507,7 @@ function Routes() {
                   ))}
                 </div>
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>
@@ -370,7 +519,12 @@ function Contact() {
   return (
     <section className="section contact" id="contato">
       <div className="section-inner contact-layout">
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+        >
           <p className="section-label">Pontos de contato</p>
           <h2>Uma conversa breve, um roteiro com presença.</h2>
           <p className="lead">
@@ -378,8 +532,20 @@ function Contact() {
             preferências de ritmo. Em até 48 horas, a Nortada devolve um desenho inicial
             com rota, hospedagem, experiências e próximos passos.
           </p>
-        </div>
-        <div className="contact-panel" aria-label="Canais de contato">
+          <div className="contact-signature">
+            <span>48h</span>
+            <span>1 concierge</span>
+            <span>roteiro privado</span>
+          </div>
+        </motion.div>
+        <motion.div
+          className="contact-panel"
+          aria-label="Canais de contato"
+          initial={{ opacity: 0, x: 34 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+        >
           <article className="contact-card">
             <h3>WhatsApp concierge</h3>
             <p>Resposta direta para começar uma rota privada ou ajustar uma viagem em andamento.</p>
@@ -390,7 +556,7 @@ function Contact() {
             <p>Ideal para grupos, datas especiais, imprensa ou experiências corporativas discretas.</p>
             <div className="contact-link contact-link-static">concierge@nortada.travel</div>
           </article>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
